@@ -1,0 +1,310 @@
+  
+<html>
+  <head>
+    <title> Todo App</title>
+  </head>
+  <body>
+    Please enter text into the input and press the add button to start your todo list.
+    <br>
+    Once you have one item in your list you can add a sub todo by pressing Add Sub Todo.
+    <br>
+    To add text to a sub todo press Edit and enter your text into the prompt input. 
+    
+    <br>
+    <br>
+  <input id ="add-input">
+  <button id ="add-button">Add</button>
+  <button id ="toggle-all-button">Toggle All</button>
+ 
+ 
+  <br>
+    <ul id ="todos-ul"></ul>
+  </body>
+  
+  <script>
+     function uuid() {
+    /*jshint bitwise:false */
+    var i, random;
+    var uuid = '';
+
+    for (i = 0; i < 32; i++) {
+      random = Math.random() * 16 | 0;
+      if (i === 8 || i === 12 || i === 16 || i === 20) {
+        uuid += '-';
+      }
+      uuid += (i === 12 ? 4 : (i === 16 ? (random & 3 | 8) : random)).toString(16);
+    }
+
+    return uuid;
+  }
+    var todos = [
+        // {todoText: 'item 1', id: uuid(), completed: false, nestedArray: 
+        // [ {todoText: 'first nested todo',id: uuid(), completed: false, nestedArray: []}]}
+      ];
+      render(todos);
+    // initalTodoText is now going to be the value of addInput.value
+    function add() {
+      var initialTodoText = addInput.value;
+      todos.push({todoText: initialTodoText, id: uuid(), completed: false, nestedArray: [] });
+      addInput.value = '';
+      render(todos);
+      addInput.focus();
+    }  
+    // function edit(event) {
+    //   var newTodoText = prompt();
+    //   var position = event.currentTarget.id;
+    //   var position = position.split('-')[1];
+    //   todos[position].todoText = newTodoText;
+
+    //   displayTodos();
+    // }
+    function findOutEdit(array, id) {
+      for (var i = 0; i < array.length; i++) {
+          if (id === array[i].id) {
+              // console.log(' We have a  match. the todo youre looking for is array[i]  : ', array[i]);
+              var newTodoText = prompt('Edit and add your text here!');
+
+              if (newTodoText !== null && newTodoText !== "") {
+                // var position = event.currentTarget.id
+                array[i].todoText = newTodoText;
+                render(todos);
+              }                    
+
+          } else {
+            findOutEdit(array[i].nestedArray, id);
+      }
+
+      }
+    }
+    function edit(event) {
+      var position = event.currentTarget.id
+      findOutEdit(todos, position);
+      // 
+    }
+    // the remove function is passed an (event) event object
+    // eventObject has a target  === removeButton
+    // target.id === id from todos id 
+    function findOutRemove (array, id) {
+      for (var i = 0; i < array.length; i++) {
+          if (id === array[i].id) {
+                  // console.log(' We have a  match. the todo youre looking for is array[i]  : ', array[i]);
+                  array.splice(i,1);
+  
+              } else {
+                findOutRemove(array[i].nestedArray, id);
+      }
+
+      }
+    }
+    function remove(event) {
+      var position = event.currentTarget.id;
+      findOutRemove(todos, position)
+      render(todos);
+    }
+
+    function findOutToggle (array, id) {
+      for (var i = 0; i < array.length; i++) {
+          if (id === array[i].id) {
+              // console.log(' We have a  match. the todo youre looking for is array[i]  : ', array[i]);
+              if (array[i].completed === false) {
+                array[i].completed = true;
+              } else {
+                array[i].completed = false
+              }
+              // array.splice(i,1);
+  
+              } else {
+                findOutToggle(array[i].nestedArray, id);
+              }
+
+      }
+    }
+    function toggle(e) {
+      position = event.currentTarget.id; //'toggle-' + i; id is a string
+      findOutToggle(todos, position);
+      render(todos);
+    }
+
+    // pass todos as first argument, pass position as the second argument
+    function findOutAddSubTodo (array, id) {
+      for (var i = 0; i < array.length; i++) {
+          if (id === array[i].id) {
+                  // console.log(' We have a  match. the todo youre looking for is array[i]  : ', array[i]);
+                  array[i].nestedArray.push({todoText: " ", id: uuid(),  completed: false, nestedArray:[]});
+  
+              } else {
+                findOutAddSubTodo(array[i].nestedArray, id);
+      }
+
+      }
+    }
+    function addSubTodo(event) {
+      var position = event.currentTarget.id;
+      // should get position and pass position as second argument to findOut
+      findOutAddSubTodo(todos, position);
+      render(todos);
+      addInput.focus();
+    }  
+    function render(array) {
+      
+      var todosUl = document.querySelector('ul');
+      todosUl.innerHTML = '';
+      
+      array.forEach( function( todo, i) {
+
+      var todoLi = document.createElement('li');
+      var ulWithinLi = document.createElement('ul');
+    
+      if (todo.completed === true) {
+            todoLi.innerText =  '(x) ' + todo.todoText;
+          } else {
+            todoLi.innerText =  '( ) ' + todo.todoText;
+          }
+          var toggleButton = document.createElement('button');
+          toggleButton.innerHTML = 'Toggle';
+          toggleButton.addEventListener('click', toggle);
+          toggleButton.id =  todo.id;
+
+
+          var editButton = document.createElement('button');
+          editButton.innerHTML = 'Edit';
+          editButton.addEventListener('click', edit);
+          editButton.id =  todo.id;
+
+
+          var addSubTodoButton = document.createElement('button');
+          addSubTodoButton.innerHTML = 'Add Sub Todo';
+          addSubTodoButton.addEventListener('click', addSubTodo);
+          addSubTodoButton.id =  todo.id;
+
+
+          var removeButton = document.createElement('button');
+          removeButton.innerHTML = 'Remove';
+          //addEventListener within displaytodos
+          removeButton.addEventListener('click', remove);
+          // we store the position on the remove button element
+          // assign position/ remove button id that will be used in remove() function
+          removeButton.id =  todo.id;
+
+
+          todoLi.appendChild(toggleButton); 
+          todoLi.appendChild(editButton);
+          todoLi.appendChild(removeButton);
+          todoLi.appendChild(addSubTodoButton);
+          todoLi.appendChild(ulWithinLi);
+          todosUl.appendChild(todoLi);
+     
+      if (todo.nestedArray.length > 0) {
+        renderNested(todo.nestedArray);
+      }
+      })
+    }
+    function renderNested (array) {
+      var findUls = document.querySelectorAll('ul');
+      var lastUlFound = findUls[findUls.length - 1];
+      var todosUl = lastUlFound;
+      todosUl.innerHTML = '';
+      
+      array.forEach( function( todo, i) {
+
+      var todoLi = document.createElement('li');
+      var ulWithinLi = document.createElement('ul');
+    
+      if (todo.completed === true) {
+            todoLi.innerText =  '(x) ' + todo.todoText;
+          } else {
+            todoLi.innerText =  '( ) ' + todo.todoText;
+          }
+          var toggleButton = document.createElement('button');
+          toggleButton.innerHTML = 'Toggle';
+          toggleButton.addEventListener('click', toggle);
+          toggleButton.id =  todo.id;
+
+          var editButton = document.createElement('button');
+          editButton.innerHTML = 'Edit';
+          editButton.addEventListener('click', edit);
+          editButton.id =  todo.id;
+
+
+          var addSubTodoButton = document.createElement('button');
+          addSubTodoButton.innerHTML = 'Add Sub Todo';
+          addSubTodoButton.addEventListener('click', addSubTodo);
+          addSubTodoButton.id =  todo.id;
+
+
+          var removeButton = document.createElement('button');
+          removeButton.innerHTML = 'Remove';
+          removeButton.addEventListener('click', remove);
+          removeButton.id = todo.id; 
+
+
+          todoLi.appendChild(toggleButton); 
+          todoLi.appendChild(editButton);
+          todoLi.appendChild(removeButton);
+          todoLi.appendChild(addSubTodoButton);
+          todoLi.appendChild(ulWithinLi);
+          todosUl.appendChild(todoLi);
+
+      if (todo.nestedArray.length > 0) {
+        renderNested(todo.nestedArray);
+      }
+
+      })
+    }
+    
+    function toggleAllNested (array, booleanAnswer) {
+      if (!booleanAnswer) {
+        booleanAnswer = null;
+      } else {
+        booleanAnswer = booleanAnswer;
+      }
+      var completedTodos = 0;
+      var booleanAnswer;
+      for (var i = 0; i < array.length; i++){
+        if (array[i].completed === true) {
+          completedTodos++;
+        } 
+
+      }  
+      // if all true...change to false
+      if (completedTodos === array.length ) {
+        for (var i = 0; i < array.length; i++) {
+          if (booleanAnswer === null){
+            array[i].completed = false;
+            booleanAnswer = false;
+          } else {
+            array[i].completed = booleanAnswer;
+          }
+        } // else change to true
+      } else {
+        for (var i = 0; i < array.length; i++) {
+          if (booleanAnswer === null) {
+            array[i].completed = true;
+            booleanAnswer = true;
+          } else {
+            array[i].completed = booleanAnswer;
+          }
+        } 
+        
+      }
+      for (var i = 0; i < array.length; i++) {
+        toggleAllNested(array[i].nestedArray,booleanAnswer )
+      }
+      }
+
+    function toggleAll() {
+      
+        toggleAllNested(todos);
+        render(todos);
+      }
+      
+      var toggleAllButton = document.getElementById('toggle-all-button');
+      toggleAllButton.addEventListener('click', toggleAll);
+      
+      var addButton = document.getElementById('add-button');
+      var addInput = document.getElementById('add-input');
+      addButton.addEventListener('click', add);
+  
+  
+  </script>
+</html>
