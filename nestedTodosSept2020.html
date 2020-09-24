@@ -1,5 +1,8 @@
- 
+  
 <html>
+  <head>
+    <title> Todo App</title>
+  </head>
   <body>
     Please enter text into the input and press the add button to start your todo list.
     <br>
@@ -9,13 +12,13 @@
     
     <br>
     <br>
-  <input id ='add-input'>
-  <button id ='add-button'>Add</button>
-  <button id ='toggle-all-button'>Toggle All</button>
+  <input id ="add-input">
+  <button id ="add-button">Add</button>
+  <button id ="toggle-all-button">Toggle All</button>
  
  
   <br>
-  <ul id ='todos-ul'>
+    <ul id ="todos-ul"></ul>
   </body>
   
   <script>
@@ -58,7 +61,7 @@
     function findOutEdit(array, id) {
       for (var i = 0; i < array.length; i++) {
           if (id === array[i].id) {
-              console.log(' We have a  match. the todo youre looking for is array[i]  : ', array[i]);
+              // console.log(' We have a  match. the todo youre looking for is array[i]  : ', array[i]);
               var newTodoText = prompt('Edit and add your text here!');
 
               if (newTodoText !== null && newTodoText !== "") {
@@ -84,7 +87,7 @@
     function findOutRemove (array, id) {
       for (var i = 0; i < array.length; i++) {
           if (id === array[i].id) {
-                  console.log(' We have a  match. the todo youre looking for is array[i]  : ', array[i]);
+                  // console.log(' We have a  match. the todo youre looking for is array[i]  : ', array[i]);
                   array.splice(i,1);
   
               } else {
@@ -102,7 +105,7 @@
     function findOutToggle (array, id) {
       for (var i = 0; i < array.length; i++) {
           if (id === array[i].id) {
-              console.log(' We have a  match. the todo youre looking for is array[i]  : ', array[i]);
+              // console.log(' We have a  match. the todo youre looking for is array[i]  : ', array[i]);
               if (array[i].completed === false) {
                 array[i].completed = true;
               } else {
@@ -126,7 +129,7 @@
     function findOutAddSubTodo (array, id) {
       for (var i = 0; i < array.length; i++) {
           if (id === array[i].id) {
-                  console.log(' We have a  match. the todo youre looking for is array[i]  : ', array[i]);
+                  // console.log(' We have a  match. the todo youre looking for is array[i]  : ', array[i]);
                   array[i].nestedArray.push({todoText: " ", id: uuid(),  completed: false, nestedArray:[]});
   
               } else {
